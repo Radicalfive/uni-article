@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "uni-list-item": "/components/uni/uni-list-item/uni-list-item"
+  }
+}

@@ -1,0 +1,45 @@
+.text-pink {
+	color: #fc5c82;
+}
+
+.bg-pink {
+	background-color: #fc5c82;
+}
+
+.bg-pink-disabled {
+	background-color: #fc92a9
+}
+
+.iconfont_3 .iconfont {
+	color: #FFFFFF;
+	font-size: 36rpx;
+}
+
+.iconfont .icon {
+	width: 94rpx;
+	height: 94rpx;
+	border-radius: 47rpx;
+	line-height: 94rpx;
+	text-align: center;
+}
+
+.iconfont_3 .green {
+	background-color: #00af3b;
+}
+
+.iconfont_3 .blue {
+	background-color: #006cff;
+}
+
+.iconfont_3 .yellow {
+	background-color: #ffc400;
+}
+
+.login-icon {
+	margin-top: 36rpx;
+	margin-right: 100rpx;
+}
+
+.login-icon:last-of-type {
+	margin-right: 0;
+}
