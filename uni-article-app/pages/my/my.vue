@@ -2,8 +2,16 @@
 	<view class="p-2">
 		<!-- 未登录 -->
 		<template v-if="!loginStatus">
-			<view>未登录</view>
-			<image :src="avatar" class="size-100 rounded-circle"></image>
+			<view class="flex align-center p-2" hover-class="bg-light">
+				<image src="../../static/img/nologin.jpeg" class="size-100 rounded-circle"></image>
+				<view class="flex flex-column flex-1 px-2">
+					<text class="font text-muted">登录，体验更多功能</text>
+				</view>
+				<text class="iconfont icon-jinru" @tap="open('login')"></text>
+			</view>
+			<view class="px-3 py-2">
+				<image src="../../static/img/banner1.jpg" mode="widthFix" class="rounded w-100"></image>
+			</view>
 		</template>
 
 		<!-- 登录 -->
@@ -67,8 +75,8 @@
 		},
 		data() {
 			return {
-				loginStatus: true,
-				nickname: 'radical',
+				loginStatus: false,
+				user: {},
 				data: [{
 						title: '帖子',
 						num: 78,
@@ -88,9 +96,19 @@
 				]
 			}
 		},
+		onShow() {
+			this.user = uni.getStorageSync('user')
+			if(Object.keys(this.user).length === 0) {
+				this.loginStatus = false
+			} else {
+				this.loginStatus = true
+			}
+			console.log(this.user)
+			console.log(this.loginStatus)
+		},
 		computed: {
 			avatar() {
-				return this.loginStatus === true ? '/static/img/me.jpg' : '/static/img/nologin.jpeg'
+				return this.user.avatar;
 			}
 		},
 		onNavigationBarButtonTap() {

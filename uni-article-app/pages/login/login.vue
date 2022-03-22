@@ -8,7 +8,7 @@
 		</view>
 		<!-- #endif -->
 		<!-- 账号密码登录 -->
-		<template v-if="choick">
+		<template v-if="choice">
 			<view>
 				<view class="text-center" style="padding-top: 130rpx; padding-bottom: 130rpx;">
 					<text class="h3 text-body">账号密码登录</text>
@@ -23,14 +23,14 @@
 					</view>
 				</view>
 				<view class="p-2">
-					<button class="rounded-circle bg-pink text-white" :class="disable ? 'bg-pink-disabled' : 'bg-pink'"
-						:loading="loading">
+					<button class="rounded-circle bg-pink text-white" :class="disabled ? 'bg-pink-disabled' : 'bg-pink'"
+						:loading="loading" @tap="login()">
 						{{ loading ? '登陆中...' : '登录' }}
 					</button>
 				</view>
 
 				<view class="text-center mt-3 text-primary font-sm">
-					<text class="p-1" @tap="choick=!choick">验证码登录</text>
+					<text class="p-1" @tap="choice=!choice">验证码登录</text>
 					<text class="text-body mx-2">|</text>
 					<text class="p-1">登录遇到问题</text>
 				</view>
@@ -68,7 +68,7 @@
 						:class="disabled ? 'bg-pink-disabled' : 'bg-pink'">登录</button>
 				</view>
 				<view class="text-center mt-3 text-primary font-sm">
-					<text class="p-1" @tap="choick=!choick">账号密码登录</text>
+					<text class="p-1" @tap="choice=!choice">账号密码登录</text>
 					<text class="text-body mx-2">|</text>
 					<text class="p-1">登录遇到问题</text>
 				</view>
@@ -84,12 +84,12 @@
 					align-center justify-center rounded-circle size-100">
 					</view>
 				</view>
-				<view class="flex-1 flex align-center justify-center" @click="appLogin">
+				<view class="flex-1 flex align-center justify-center">
 					<view class="iconfont icon-QQ bg-primary font-lg text-white flex 
 					align-center justify-center rounded-circle size-100">
 					</view>
 				</view>
-				<view class="flex-1 flex align-center justify-center" @click="appLogin">
+				<view class="flex-1 flex align-center justify-center" >
 					<view class="iconfont icon-xinlangweibo bg-warning font-lg text-white flex 
 					align-center justify-center rounded-circle size-100">
 					</view>
@@ -108,11 +108,11 @@
 		data() {
 			return {
 				disabled: false,
-				choick: true,
+				choice: true,
 				checked: false,
 				loading: false,
-				phone: '',
-				password: '',
+				phone: '19908324671',
+				password: '123123',
 				verifyCode: '',
 				limitTime: 0,
 			}
@@ -136,22 +136,40 @@
 				// ...更多验证
 				return true;
 			},
-			// login() {
-			// 	// 账号密码登录
-			// 	let data = {
-			// 		username: '杨阳',
-			// 		password: '123123'
-			// 	}
-			// 	const url = 'http://106.14.169.149:8071/login';
-			// 	uni.request({
-			// 		url: url,
-			// 		method: 'POST',
-			// 		data: data
-			// 	}).then((res) => {
-			// 		// console.log(res[1].data);
-			// 		console.log(res[1].data.data.nickname);
-			// 	})
-			// },
+			login() {
+				// 账号密码登录
+				let data = {
+					phone: this.phone,
+					password: this.password
+				}
+				const url = 'http://localhost:8080/api/v1/users/login';
+				uni.request({
+					url: url,
+					method: 'POST',
+					data: data
+				}).then((res) => {
+					if(res[1].data.code === 1) {
+						uni.showToast({
+							title:'登录成功',
+							duration:1000
+						});
+						uni.setStorage({
+							key:'user',
+							data:res[1].data.data,
+							success:function(){
+								uni.switchTab({
+									url:'../my/my'
+								})
+							}
+						});
+					}else {
+						uni.showToast({
+							title:res[1].data.msg,
+							duration:1000
+						});
+					}
+				})
+			},
 			getCode() {
 				// 防止重复点击获取验证码
 				if (this.limitTime > 0) {
