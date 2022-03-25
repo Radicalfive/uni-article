@@ -24,4 +24,20 @@ public interface UserService {
      * @return user
      */
     User getUser(String phone);
+
+    /**
+     * 验证码登录
+     *
+     * @param loginDto 登录dto对象
+     * @return 登录结果
+     */
+    boolean loginByCode(LoginDto loginDto);
+
+    /**
+     * 修改用户信息
+     *
+     * @param user 用户对象
+     * @return User
+     */
+    User updateUser(User user);
 }

@@ -1,9 +1,6 @@
 package top.radical.article.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import top.radical.article.model.entity.User;
 
 /**
@@ -17,8 +14,8 @@ public interface UserMapper {
      *
      * @param user 入参user对象
      */
-    @Insert("INSERT INTO t_user(phone,password,nickname,avatar,gender,birthday,address,create_time)" +
-            "VALUES (#{phone},#{password},#{nickname},#{avatar},#{gender},#{birthday},#{address},#{createTime})")
+    @Insert("INSERT INTO t_user(phone,password,nickname,avatar,gender,birthday,address,create_time,banner)" +
+            "VALUES (#{phone},#{password},#{nickname},#{avatar},#{gender},#{birthday},#{address},#{createTime},#{banner})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insert(User user);
 
@@ -30,4 +27,13 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM t_user WHERE phone = #{phone}")
     User findUserByPhone(@Param("phone") String phone);
+
+    /**
+     * 修改用户信息
+     *
+     * @param user 用户对象
+     */
+    @Update("UPDATE t_user SET password=#{password},nickname=#{nickname},avatar=#{avatar}," +
+            "gender=#{gender},birthday=#{birthday},address=#{address},banner=#{banner} WHERE id=#{id}")
+    void updateUser(User user);
 }

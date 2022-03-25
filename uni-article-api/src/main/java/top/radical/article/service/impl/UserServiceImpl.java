@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import top.radical.article.mapper.UserMapper;
 import top.radical.article.model.dto.LoginDto;
 import top.radical.article.model.entity.User;
+import top.radical.article.service.RedisService;
 import top.radical.article.service.UserService;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author : radical
@@ -20,11 +22,14 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private RedisService redisService;
+
     @Override
     public boolean login(LoginDto loginDto) {
         User user = getUser((loginDto.getPhone()));
         if (user != null) {
-            return DigestUtils.md5Hex(loginDto.getPassword()).equals(user.getPassword());
+            //return DigestUtils.md5Hex(loginDto.getPassword()).equals(user.getPassword());
         }
         return false;
     }
@@ -32,5 +37,60 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(String phone) {
         return userMapper.findUserByPhone(phone);
+    }
+
+    @Override
+    public boolean loginByCode(LoginDto loginDto) {
+        //检查redis中是否存在这个手机号
+        boolean flag = redisService.existsKey(loginDto.getPhone());
+        if (flag) {
+            // 取出redis中之前存储的验证码
+            String saveCode = redisService.getValue(loginDto.getPhone(), String.class);
+            // 和前端传的验证码进行比对
+            if (saveCode.equalsIgnoreCase(loginDto.getCode())) {
+                // 查找数据库该手机号用户是否存在
+                User user = getUser(loginDto.getPhone());
+                //不存在则注册为新用户
+                if (user == null) {
+                    //不存在手机号，就构建新用户记录，补充必备字段写入数据库，一键注册并登录
+                    User saveUser = User.builder()
+                            .phone(loginDto.getPhone())
+                            .nickname("新用户")
+                            .avatar("/static/img/nologin.jpeg")
+                            .createTime(new Date())
+                            .build();
+                    userMapper.insert(saveUser);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 修改用户信息
+     * @param user 用户对象
+     * @return saveUser
+     */
+    @Override
+    public User updateUser(User user) {
+        //现根据手机号查出数据库原用户信息
+        User saveUser = getUser(user.getPhone());
+        //如果是修改密码的请求，需要将传来的密码加密
+        if (!user.getPassword().equals(saveUser.getPassword())) {
+            saveUser.setPassword(DigestUtils.md5Hex(user.getPassword()));
+        }else {
+            saveUser.setPassword(user.getPassword());
+        }
+        saveUser.setNickname(user.getNickname());
+        saveUser.setAvatar(user.getAvatar());
+        saveUser.setGender(user.getGender());
+        saveUser.setBirthday(user.getBirthday());
+        saveUser.setAddress(user.getAddress());
+        saveUser.setBanner(user.getBanner());
+        //更新数据
+        userMapper.updateUser(saveUser);
+        // 将修改后的用户信息返回
+        return saveUser;
     }
 }
