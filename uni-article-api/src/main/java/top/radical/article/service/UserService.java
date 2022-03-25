@@ -1,5 +1,6 @@
 package top.radical.article.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import top.radical.article.model.dto.LoginDto;
 import top.radical.article.model.entity.User;
 
@@ -40,4 +41,12 @@ public interface UserService {
      * @return User
      */
     User updateUser(User user);
+
+    /**
+     * OSS文件上传
+     *
+     * @param file 文件对象
+     * @return 上传之后的url
+     */
+    String uploadFile(MultipartFile file);
 }

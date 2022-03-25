@@ -1,13 +1,16 @@
 package top.radical.article.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.radical.article.common.ResponseResult;
 import top.radical.article.common.ResultCode;
 import top.radical.article.model.dto.LoginDto;
 import top.radical.article.model.entity.User;
 import top.radical.article.service.RedisService;
 import top.radical.article.service.UserService;
+import top.radical.article.util.FileResource;
 import top.radical.article.util.SmsUtil;
 import top.radical.article.util.StringUtil;
 
@@ -30,6 +33,9 @@ public class UserController {
 
     @Resource
     private RedisService redisService;
+
+    @Resource
+    private FileResource fileResource;
 
     /**
      * 账号密码登录
@@ -87,5 +93,25 @@ public class UserController {
     public User update(@RequestBody User user) {
         log.info("user:" + user);
         return userService.updateUser(user);
+    }
+
+    @PostMapping(value = "/upload")
+    public ResponseResult uploadFile(MultipartFile file) {
+        log.info("开始上传");
+        //声明图片的地址路径，返回到前端
+        String path = null;
+        //判断文件是否为空
+        if (file != null) {
+            //获取文件上传的名称
+            String fileName = file.getOriginalFilename();
+            log.info(fileName);
+            //调用上传服务，得到上传后的新文件名
+            path = userService.uploadFile(file);
+        }
+        if (StringUtils.isNotBlank(path)) {
+            path = fileResource.getOssHost() + path;
+            log.info(path);
+        }
+        return ResponseResult.success(path);
     }
 }
